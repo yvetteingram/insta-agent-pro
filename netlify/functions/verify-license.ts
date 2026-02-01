@@ -15,8 +15,7 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  // NOTE: In a real production environment, you would store your Gumroad Product Permalink
-  // in an environment variable like GUMROAD_PRODUCT_PERMALINK.
+  // The permalink is the ID of your product on Gumroad
   const PRODUCT_PERMALINK = process.env.GUMROAD_PRODUCT_PERMALINK || 'instaagent-pro';
 
   try {

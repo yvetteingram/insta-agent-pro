@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 interface LicenseGateProps {
@@ -13,7 +12,7 @@ const LicenseGate: React.FC<LicenseGateProps> = ({ onSuccess, onBack }) => {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanKey = key.trim().toUpperCase();
+    const cleanKey = key.trim(); // Removed .toUpperCase() because Gumroad keys are case-sensitive
     if (!cleanKey) return;
 
     setLoading(true);
@@ -126,3 +125,4 @@ const LicenseGate: React.FC<LicenseGateProps> = ({ onSuccess, onBack }) => {
 };
 
 export default LicenseGate;
+
