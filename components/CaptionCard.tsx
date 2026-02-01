@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { CaptionOption, ContentType } from '../types';
 
@@ -36,6 +35,17 @@ const CaptionCard: React.FC<CaptionCardProps> = ({ caption, index, businessName,
     navigator.clipboard.writeText(fullText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const element = document.createElement("a");
+    const file = new Blob([fullText], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    const safeName = displayBusinessName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    element.download = `${safeName}-caption-${index + 1}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   return (
@@ -128,18 +138,27 @@ const CaptionCard: React.FC<CaptionCardProps> = ({ caption, index, businessName,
         )}
       </div>
 
-      <div className="px-8 py-5 bg-slate-50 border-t border-slate-50 flex items-center justify-between">
+      <div className="px-8 py-5 bg-slate-50 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
         <span className={`text-[10px] font-black tracking-widest ${charCount > IG_CHAR_LIMIT ? 'text-red-500' : 'text-slate-400'} uppercase`}>
           {charCount} / {IG_CHAR_LIMIT}
         </span>
-        <button
-          onClick={handleCopy}
-          className={`text-[10px] font-black px-6 py-2.5 rounded-xl transition-all uppercase tracking-widest shadow-sm ${
-            copied ? 'bg-green-500 text-white' : 'bg-slate-900 text-white hover:bg-black'
-          }`}
-        >
-          {copied ? 'Copied!' : 'Copy Results'}
-        </button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <button
+            onClick={handleDownload}
+            title="Download as .txt file"
+            className="flex-1 sm:flex-none text-[10px] font-black px-4 py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-white hover:text-slate-900 transition-all uppercase tracking-widest bg-transparent shadow-sm"
+          >
+            TXT
+          </button>
+          <button
+            onClick={handleCopy}
+            className={`flex-[2] sm:flex-none text-[10px] font-black px-6 py-2.5 rounded-xl transition-all uppercase tracking-widest shadow-sm ${
+              copied ? 'bg-green-500 text-white' : 'bg-slate-900 text-white hover:bg-black'
+            }`}
+          >
+            {copied ? 'Copied!' : 'Copy Results'}
+          </button>
+        </div>
       </div>
     </div>
   );
