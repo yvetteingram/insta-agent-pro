@@ -14,11 +14,21 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  // Ensure this EXACTLY matches the permalink in your Gumroad dashboard (the URL part)
-  const PRODUCT_PERMALINK = process.env.GUMROAD_PRODUCT_PERMALINK || 'instaagent-pro';
+  // Configuration must be set in Netlify environment variables
+  const PRODUCT_PERMALINK = process.env.GUMROAD_PRODUCT_PERMALINK;
+  const PRODUCT_ID = process.env.GUMROAD_PRODUCT_ID;
+
+  if (!PRODUCT_PERMALINK || !PRODUCT_ID) {
+    console.error('Server Configuration Error: GUMROAD_PRODUCT_PERMALINK or GUMROAD_PRODUCT_ID is not defined in environment variables.');
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ success: false, error: 'Server configuration error. Please contact support.' }),
+    };
+  }
 
   try {
     const params = new URLSearchParams({
+      product_id: PRODUCT_ID,
       product_permalink: PRODUCT_PERMALINK,
       license_key: licenseKey,
     });
@@ -46,7 +56,7 @@ export const handler: Handler = async (event) => {
         statusCode: 401,
         body: JSON.stringify({ 
           success: false, 
-          error: data.message || 'Invalid or deactivated license key. Check your permalink settings.' 
+          error: data.message || 'Invalid or deactivated license key.' 
         }),
       };
     }
@@ -58,4 +68,3 @@ export const handler: Handler = async (event) => {
     };
   }
 };
-
