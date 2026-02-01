@@ -12,15 +12,14 @@ const LicenseGate: React.FC<LicenseGateProps> = ({ onSuccess, onBack }) => {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanKey = key.trim(); // Removed .toUpperCase() because Gumroad keys are case-sensitive
+    const cleanKey = key.trim(); 
     if (!cleanKey) return;
 
     setLoading(true);
     setError(null);
 
-    // Create a timeout controller to prevent the "hang"
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000); 
 
     try {
       const response = await fetch('/.netlify/functions/verify-license', {
@@ -80,8 +79,8 @@ const LicenseGate: React.FC<LicenseGateProps> = ({ onSuccess, onBack }) => {
           <div className="space-y-2">
             <input
               type="text"
-              placeholder="PASTE LICENSE KEY"
-              className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl px-6 py-4 text-center font-black text-slate-900 transition-all outline-none tracking-widest uppercase placeholder:normal-case placeholder:font-medium placeholder:tracking-normal placeholder:text-slate-300"
+              placeholder="Paste License Key (Case Sensitive)"
+              className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl px-6 py-4 text-center font-bold text-slate-900 transition-all outline-none placeholder:font-medium placeholder:text-slate-300"
               value={key}
               onChange={(e) => setKey(e.target.value)}
               required

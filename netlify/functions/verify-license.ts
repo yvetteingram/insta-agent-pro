@@ -1,4 +1,3 @@
-
 import { Handler } from '@netlify/functions';
 
 export const handler: Handler = async (event) => {
@@ -15,21 +14,27 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  // The permalink is the ID of your product on Gumroad
+  // Ensure this EXACTLY matches the permalink in your Gumroad dashboard (the URL part)
   const PRODUCT_PERMALINK = process.env.GUMROAD_PRODUCT_PERMALINK || 'instaagent-pro';
 
   try {
-    // Gumroad API URL for license verification
+    const params = new URLSearchParams({
+      product_permalink: PRODUCT_PERMALINK,
+      license_key: licenseKey,
+    });
+
     const response = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        product_permalink: PRODUCT_PERMALINK,
-        license_key: licenseKey,
-      }),
+      body: params.toString(),
     });
 
     const data = await response.json();
+
+    // Log the response for debugging in the Netlify dashboard
+    if (!data.success) {
+      console.warn('Gumroad verification failed for key:', licenseKey.substring(0, 8) + '...', 'Reason:', data.message || 'Unknown');
+    }
 
     if (data.success && !data.purchase.refunded && !data.purchase.chargebacked) {
       return {
@@ -39,7 +44,10 @@ export const handler: Handler = async (event) => {
     } else {
       return {
         statusCode: 401,
-        body: JSON.stringify({ success: false, error: 'Invalid or deactivated license key' }),
+        body: JSON.stringify({ 
+          success: false, 
+          error: data.message || 'Invalid or deactivated license key. Check your permalink settings.' 
+        }),
       };
     }
   } catch (error) {
@@ -50,3 +58,4 @@ export const handler: Handler = async (event) => {
     };
   }
 };
+
