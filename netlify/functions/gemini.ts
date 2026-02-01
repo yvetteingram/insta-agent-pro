@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 
 export const handler = async (event: any) => {
@@ -9,30 +8,24 @@ export const handler = async (event: any) => {
     };
   }
 
-  if (!process.env.API_KEY) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "API_KEY_INVALID: process.env.API_KEY is missing" }),
-    };
-  }
-
   try {
     const { topic, businessType, tone, goal, contentType, imageBase64, imageUrl } = JSON.parse(event.body);
 
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // Initializing the AI client. 
+    // Guideline: Assume process.env.API_KEY is pre-configured and valid in the environment.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
     const model = 'gemini-3-flash-preview';
     const isStory = contentType === 'Story';
 
     const systemPrompt = `
-      You are a professional Instagram Caption Agent for ${businessType} businesses.
-      TASK: Generate exactly 3 (three) distinct Instagram caption options. No more, no less.
+      You are a professional Instagram Content Agent for ${businessType} businesses.
+      TASK: Generate exactly 3 (three) distinct Instagram caption options. 
       TONE: ${tone}
       GOAL: ${goal}
       FORMAT: ${contentType}
       TOPIC: "${topic}"
 
       STRICT RULES:
-      - COUNT: Provide exactly 3 captions. This is critical.
       - HOOK: Start with a scroll-stopping first line.
       - BODY: High-value, conversational copy perfectly suited for Instagram.
       - CTA: Natural, goal-oriented closing for Instagram conversion.
@@ -86,7 +79,6 @@ export const handler = async (event: any) => {
           properties: {
             captions: {
               type: Type.ARRAY,
-              // Note: minItems/maxItems are best-effort constraints in many AI schema engines
               items: {
                 type: Type.OBJECT,
                 properties: {
@@ -112,10 +104,12 @@ export const handler = async (event: any) => {
       body: response.text,
     };
   } catch (error: any) {
-    console.error("Function Error:", error);
+    console.error("Gemini Function Error:", error);
+    // If process.env.API_KEY is missing, the SDK will throw an error that is caught here.
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message || "Failed to generate content" }),
     };
   }
 };
+
